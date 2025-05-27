@@ -1,6 +1,6 @@
 # 🤖 DSR MoveIt-Gazebo 연동 실습 정리
 
----
+
 
 ## 1️⃣ MoveIt 구조
 
@@ -26,7 +26,7 @@
     * `/dsr_moveit_controller`로 전송
     * 실제(또는 가상) 로봇이 해당 trajectory대로 움직임
 
----
+
 
 ## 2️⃣ Gazebo 구조
 
@@ -44,7 +44,7 @@
 * MoveIt의 Plan & Execute 결과를 **Gazebo 시뮬레이터에도 동기 반영**
 * 실제 로봇과 **Gazebo 시뮬로봇이 동시에 동일 궤적**을 따라 움직이도록 함
 
----
+
 
 ## 4️⃣ 기존 구조의 한계
 
@@ -61,7 +61,7 @@
   * 액션 서버를 topic subscriber로 “가로채기” 불가
   * 상태 토픽(controller\_state 등)은 단순 상태 보고용, relay에 부적합
 
----
+
 
 ## 5️⃣ 해결 방법: 중계(Relay) 노드 도입
 
@@ -78,7 +78,7 @@
 4. Gazebo 명령 토픽(`/dsr01/gz/dsr_position_controller/commands`) 형식(`Float64MultiArray`)으로 변환하여 publish
 5. 필요에 따라 여러 컨트롤러에도 동시에 분배 가능
 
----
+
 
 ## 6️⃣ 결론
 
@@ -89,7 +89,7 @@
 
 * 중계 노드에 실제로봇/가상로봇 동시 제어나 추가 기능도 구현 가능
 
----
+
 
 > 본 구조는 MoveIt과 Gazebo의 명령 체계 차이로 인한 **동기화 문제**를 해결하는 표준적이고 합리적인 접근 방식이다.
 > 핵심은 **액션-토픽 변환 중계**이며, 실환경 확장/응용도 용이하다.
