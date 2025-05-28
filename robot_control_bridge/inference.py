@@ -2,6 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from inference_interfaces.msg import InferencePayload
+from inference_interfaces.msg import ActionChunk
 
 from cv_bridge import CvBridge
 
@@ -14,6 +15,7 @@ import os
 
 # constant
 INFERENCE = "/inference"
+ACTION_CHUNK = "/action_chunk"
 
 class ColabInference():
     _SAMPLE_PAYLOAD = {
@@ -82,7 +84,7 @@ class Inference(Node):
         self.create_subscription(InferencePayload, INFERENCE, self.payload_callback, 10)
 
         # pub for action_chunk
-        # self.publisher = self.create_publisher()
+        self.publisher = self.create_publisher(ActionChunk, ACTION_CHUNK, 10)
 
     def payload_callback(self, sub):
         # payload 재구성
@@ -96,6 +98,13 @@ class Inference(Node):
 
         action_chunk = self.colab_inference.send_payload(payload)
         self.get_logger().info(f'action_chunk: {action_chunk}')
+
+        # action chunk
+        pub = ActionChunk()
+        pub.rows, pub.cols = len(action_chunk), len(action_chunk[0])
+        pub.data = [action for action_token in action_chunk for action in action_token]
+
+        self.publisher.publish(pub)
 
 def main(args=None):
     rclpy.init(args=args)
