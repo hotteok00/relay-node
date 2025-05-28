@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'joint_trajectory_to_position_cmd'
+package_name = 'robot_control_bridge'
 
 setup(
     name=package_name,
@@ -20,7 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'joint_trajectory_to_position_cmd_node = joint_trajectory_to_position_cmd.joint_trajectory_to_position_cmd_node:main',
+            'relay_node = robot_control_bridge.relay_node:main',
+            'inference = robot_control_bridge.inference:main',
+            'payload_publisher = robot_control_bridge.payload_publisher:main',
         ],
     },
 )

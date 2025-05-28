@@ -4,9 +4,9 @@ from rclpy.action import ActionServer
 from control_msgs.action import FollowJointTrajectory
 from std_msgs.msg import Float64MultiArray
 
-class JointTrajectoryToPositionCmd(Node):
+class RelayNode(Node):
     def __init__(self):
-        super().__init__('joint_trajectory_to_position_cmd_node')
+        super().__init__('relay_node')
         # MoveIt에서 오는 액션 goal을 받는 서버
         self._action_server = ActionServer(
             self,
@@ -48,7 +48,7 @@ class JointTrajectoryToPositionCmd(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = JointTrajectoryToPositionCmd()
+    node = RelayNode()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
