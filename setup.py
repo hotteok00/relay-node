@@ -23,6 +23,7 @@ setup(
             'relay_node = robot_control_bridge.relay_node:main',
             'inference = robot_control_bridge.inference:main',
             'payload_publisher = robot_control_bridge.payload_publisher:main',
+            'sim_test = robot_control_bridge.sim_test:main',
         ],
     },
 )
