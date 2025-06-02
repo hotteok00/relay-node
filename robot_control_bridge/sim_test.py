@@ -65,7 +65,10 @@ class ActionChunkToTrajectory(Node):
             raw_joint_values = sub.data[offset : offset+sub.cols]
             filtered_joint_values = [v for i, v in enumerate(raw_joint_values) if i != 2 and i != len(raw_joint_values) - 1]
             
-            # insert 7 IK to 6 FK logic here
+            # insert convert logic
+            # 1. get current posx (6DoF) to get IK 7DOF joints
+            # 2. compute FK 7DOF joints with action chunk (7j + 1g)
+            # 3. convert IK 7DoF to 6DoF joint
             
             # ======================================================== #
             
