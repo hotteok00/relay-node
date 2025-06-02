@@ -24,6 +24,7 @@ setup(
             'inference = robot_control_bridge.inference:main',
             'payload_publisher = robot_control_bridge.payload_publisher:main',
             'sim_test = robot_control_bridge.sim_test:main',
+            'image_and_joint = robot_control_bridge.image_and_joint:main',
         ],
     },
 )
