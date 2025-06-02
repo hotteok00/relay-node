@@ -60,6 +60,7 @@ class PayloadPublisher(Node):
         msg.joint_position = data["joint_position"]
         msg.gripper_position = data["gripper_position"]
         msg.prompt = "fold the blanket"
+        # msg.prompt = input('input prompt: ')
 
         self.publisher.publish(msg)
         self.get_logger().info(f"✅ Sent InferencePayload : Real_{self.img_idx}")
