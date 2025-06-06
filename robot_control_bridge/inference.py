@@ -3,7 +3,6 @@ import rclpy
 from rclpy.node import Node
 from inference_interfaces.msg import InferencePayload
 from inference_interfaces.msg import ActionChunk
-
 from cv_bridge import CvBridge
 
 # colab
@@ -14,8 +13,11 @@ from dotenv import load_dotenv
 import os
 
 # constant
-INFERENCE = "/inference"
-ACTION_CHUNK = "/action_chunk"
+from robot_control_bridge import config
+# INFERENCE = "/inference"
+# ACTION_CHUNK = "/action_chunk"
+INFERENCE = config.INFERENCE
+ACTION_CHUNK = config.ACTION_CHUNK
 
 sample_action_chunk = [
     [0.05953603326504964, 0.2615764716171902, 0.07282771495818596, 0.2555080993741107, 0.034175989975872345, 0.36930163828633567, -0.1129511131982861, 0.032671105213359114], 

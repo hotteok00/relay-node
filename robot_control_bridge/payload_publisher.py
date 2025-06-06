@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from inference_interfaces.msg import InferencePayload, ImageAndJoint
 from cv_bridge import CvBridge
 
@@ -12,8 +12,11 @@ from dotenv import load_dotenv
 import os
 
 # constant
-INFERENCE = "/inference"
-IMAGE_AND_JOINT = '/image_and_joint'
+from robot_control_bridge import config
+# INFERENCE = "/inference"
+# IMAGE_AND_JOINT = '/image_and_joint'
+INFERENCE = config.INFERENCE
+IMAGE_AND_JOINT = config.IMAGE_AND_JOINT
 
 class PayloadPublisher(Node):
     def __init__(self):
@@ -81,16 +84,31 @@ class PayloadPublisher(Node):
 
         msg = InferencePayload()
 
-        msg.exterior_image_1_left = self.cam['image']
+        compressed_image = self.cam['image']
+        converted_image = self.compressed_to_image(compressed_image)
+        msg.exterior_image_1_left = converted_image
         dummy_img_1 = np.random.randint(0, 256, (224, 224, 3), dtype=np.uint8)
         msg.wrist_image_left = self.bridge.cv2_to_imgmsg(dummy_img_1, encoding='bgr8')
 
         msg.joint_position = self.cam['joint']
         msg.gripper_position = 0.5
-        msg.prompt = "do something"
+        msg.prompt = "pick up tape"
 
         self.publisher.publish(msg)
         self.get_logger().info(f"✅ Sent InferencePayload : CAM")
+    
+    def compressed_to_image(self, compressed_image_msg: CompressedImage) -> Image:
+        # 1. CompressedImage의 data는 byte 스트림임 (ex. JPEG)
+        np_arr = np.frombuffer(compressed_image_msg.data, np.uint8)
+        cv_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)  # BGR 포맷
+
+        # 2. OpenCV 이미지를 ROS2 Image 메시지로 변환
+        ros_image = self.bridge.cv2_to_imgmsg(cv_image, encoding="bgr8")
+
+        # 3. 헤더 동기화 (선택)
+        ros_image.header = compressed_image_msg.header
+
+        return ros_image
 
     def cam_callback(self, msg):
         self.get_logger().info(f"{__name__}")

@@ -1,16 +1,20 @@
 import rclpy
 from rclpy.node import Node
-
-from sensor_msgs.msg import Image, JointState
+from sensor_msgs.msg import Image, CompressedImage, JointState
 from std_msgs.msg import Header
 from builtin_interfaces.msg import Time
 from inference_interfaces.msg import ImageAndJoint as IJ
 
 from collections import deque
 
-IMAGE_RAW = '/image_raw'
-JOINT_STATES = '/joint_states'
-IMAGE_AND_JOINT = '/image_and_joint'
+from robot_control_bridge import config
+# IMAGE_RAW = '/image_raw'
+# JOINT_STATES = '/joint_states'
+# IMAGE_AND_JOINT = '/image_and_joint'
+IMAGE_RAW = config.IMAGE_RAW
+JOINT_STATES = config.JOINT_STATES
+IMAGE_AND_JOINT = config.IMAGE_AND_JOINT
+max_queue_len = config.max_queue_len
 
 def get_ros_time(msg):
     # sensor_msgs/Image, JointState 등에서 header.stamp
@@ -20,13 +24,14 @@ class ImageAndJoint(Node):
     def __init__(self):
         super().__init__('image_and_joint')
 
-        self.max_queue_len = 10
-        self.image_queue = deque(maxlen=self.max_queue_len)
-        self.joint_queue = deque(maxlen=self.max_queue_len)
+        # self.max_queue_len = 10
+        self.image_queue = deque(maxlen=max_queue_len)
+        self.joint_queue = deque(maxlen=max_queue_len)
 
         self.joint_dict = {f'joint_{i}':i for i in range(1, 7)}
 
-        self.create_subscription(Image, IMAGE_RAW, self.image_callback, 10)
+        # self.create_subscription(Image, IMAGE_RAW, self.image_callback, 10)
+        self.create_subscription(CompressedImage, IMAGE_RAW, self.image_callback, 10)
         self.create_subscription(JointState, JOINT_STATES, self.joint_callback, 10)
 
         self.publisher_ = self.create_publisher(IJ, IMAGE_AND_JOINT, 10)
@@ -81,7 +86,6 @@ class ImageAndJoint(Node):
                 f"joint name: {joint_msg.name}"
                 f"joint pos: {joint_msg.position}"
             )
-
 
 def main():
     rclpy.init()
