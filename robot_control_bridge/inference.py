@@ -40,7 +40,7 @@ class ColabInference():
     }
 
     def __init__(self):
-        load_dotenv('/home/lhj/ros2_ws/src/robot_control_bridge/.env')
+        load_dotenv(os.path.expanduser('~/ros2_ws/src/robot_control_bridge/.env'))
         self.url = os.getenv("url")
         print(f'url: {self.url}')
         
