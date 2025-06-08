@@ -93,7 +93,8 @@ class ActionChunkToTrajectory(Node):
 
             # 3번째(index 2)와 마지막(index -1)은 제외
             raw_joint_values = sub.data[offset : offset+sub.cols]
-            filtered_joint_values = [v for i, v in enumerate(raw_joint_values) if i != 2 and i != len(raw_joint_values) - 1]
+            # filtered_joint_values = [v for i, v in enumerate(raw_joint_values) if i != 2 and i != len(raw_joint_values) - 1]
+            filtered_joint_values = [v for i, v in enumerate(raw_joint_values) if i != len(raw_joint_values) - 1]
             
             # insert convert logic
             # 1. get current posx (6DoF) to get IK 7DOF joints

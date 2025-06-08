@@ -1,6 +1,7 @@
 # ros2
 import rclpy
 from rclpy.node import Node
+from std_msgs.msg import Float64MultiArray
 from inference_interfaces.msg import InferencePayload
 from inference_interfaces.msg import ActionChunk
 from cv_bridge import CvBridge
@@ -18,6 +19,7 @@ from robot_control_bridge import config
 # ACTION_CHUNK = "/action_chunk"
 INFERENCE = config.INFERENCE
 ACTION_CHUNK = config.ACTION_CHUNK
+JOINT_COMMMAND = config.JOINT_COMMMAND
 
 sample_action_chunk = [
     [0.05953603326504964, 0.2615764716171902, 0.07282771495818596, 0.2555080993741107, 0.034175989975872345, 0.36930163828633567, -0.1129511131982861, 0.032671105213359114], 
@@ -104,17 +106,26 @@ class Inference(Node):
         self.create_subscription(InferencePayload, INFERENCE, self.payload_callback, 10)
 
         # pub for action_chunk
-        self.publisher = self.create_publisher(ActionChunk, ACTION_CHUNK, 10)
+        self.publisher_ac = self.create_publisher(ActionChunk, ACTION_CHUNK, 10)
+
+        self.publisher_jc = self.create_publisher(Float64MultiArray, JOINT_COMMMAND, 10)
 
     def payload_callback(self, sub):
         # payload 재구성
-        payload = {
+        payload = {     # droid
             "observation/exterior_image_1_left": self.bridge.imgmsg_to_cv2(sub.exterior_image_1_left, desired_encoding='bgr8'),
             "observation/wrist_image_left": self.bridge.imgmsg_to_cv2(sub.wrist_image_left, desired_encoding='bgr8'),
             "observation/joint_position": np.array(sub.joint_position, dtype=np.float64),
             "observation/gripper_position": np.array([sub.gripper_position], dtype=np.float64),
             "prompt": sub.prompt,
         }
+
+        # payload = {     # libero
+        #     "observation/state": np.concatenate((sub.joint_position, [0, sub.gripper_position]), dtype=np.float64),
+        #     "observation/image": self.bridge.imgmsg_to_cv2(sub.exterior_image_1_left, desired_encoding='bgr8'),
+        #     "observation/wrist_image": self.bridge.imgmsg_to_cv2(sub.wrist_image_left, desired_encoding='bgr8'),
+        #     "prompt": sub.prompt,
+        # }
 
         action_chunk = self.colab_inference.inferenc_by_code(payload)
         self.get_logger().info(f'action_chunk: {action_chunk}')
@@ -124,7 +135,13 @@ class Inference(Node):
         pub.rows, pub.cols = len(action_chunk), len(action_chunk[0])
         pub.data = [action for action_token in action_chunk for action in action_token]
 
-        self.publisher.publish(pub)
+        self.publisher_ac.publish(pub)
+
+        for action_token in action_chunk:
+            pub = Float64MultiArray()
+            pub.data = action_token[:6]
+            self.publisher_jc.publish(pub)
+            input('if done')
 
 def main(args=None):
     rclpy.init(args=args)
