@@ -112,20 +112,20 @@ class Inference(Node):
 
     def payload_callback(self, sub):
         # payload 재구성
-        payload = {     # droid
-            "observation/exterior_image_1_left": self.bridge.imgmsg_to_cv2(sub.exterior_image_1_left, desired_encoding='bgr8'),
-            "observation/wrist_image_left": self.bridge.imgmsg_to_cv2(sub.wrist_image_left, desired_encoding='bgr8'),
-            "observation/joint_position": np.array(sub.joint_position, dtype=np.float64),
-            "observation/gripper_position": np.array([sub.gripper_position], dtype=np.float64),
-            "prompt": sub.prompt,
-        }
-
-        # payload = {     # libero
-        #     "observation/state": np.concatenate((sub.joint_position, [0, sub.gripper_position]), dtype=np.float64),
-        #     "observation/image": self.bridge.imgmsg_to_cv2(sub.exterior_image_1_left, desired_encoding='bgr8'),
-        #     "observation/wrist_image": self.bridge.imgmsg_to_cv2(sub.wrist_image_left, desired_encoding='bgr8'),
+        # payload = {     # droid
+        #     "observation/exterior_image_1_left": self.bridge.imgmsg_to_cv2(sub.exterior_image_1_left, desired_encoding='bgr8'),
+        #     "observation/wrist_image_left": self.bridge.imgmsg_to_cv2(sub.wrist_image_left, desired_encoding='bgr8'),
+        #     "observation/joint_position": np.array(sub.joint_position, dtype=np.float64),
+        #     "observation/gripper_position": np.array([sub.gripper_position], dtype=np.float64),
         #     "prompt": sub.prompt,
         # }
+
+        payload = {     # libero
+            "observation/state": np.concatenate((sub.joint_position, [0, sub.gripper_position]), dtype=np.float64),
+            "observation/image": self.bridge.imgmsg_to_cv2(sub.exterior_image_1_left, desired_encoding='bgr8'),
+            "observation/wrist_image": self.bridge.imgmsg_to_cv2(sub.wrist_image_left, desired_encoding='bgr8'),
+            "prompt": sub.prompt,
+        }
 
         action_chunk = self.colab_inference.inferenc_by_code(payload)
         self.get_logger().info(f'action_chunk: {action_chunk}')
